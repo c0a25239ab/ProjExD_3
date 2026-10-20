@@ -171,7 +171,9 @@ def main():
                 return
 
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
-                # スペースキーを押すたびにビームを追加
+                """""
+                スペースキーを押すたびにビームを追加
+                """""
                 beams.append(Beam(bird))
 
         screen.blit(bg_img, [0, 0])
