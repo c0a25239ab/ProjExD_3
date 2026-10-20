@@ -89,7 +89,7 @@ class Beam:
     """
     こうかとんが放つビームに関するクラス
     """
-    def __init__(self, bird: "Bird"):
+    def __init__(self, bird:"Bird"):
         """
         ビーム画像Surfaceを生成する
         引数 bird：ビームを放つこうかとん（Birdインスタンス）
@@ -120,7 +120,7 @@ class Bomb:
         引数1 color：爆弾円の色タプル
         引数2 rad：爆弾円の半径
         """
-        self.img = pg.Surface((2 * rad, 2 * rad))
+        self.img = pg.Surface((2*rad, 2*rad))
         pg.draw.circle(self.img, color, (rad, rad), rad)
         self.img.set_colorkey((0, 0, 0))
         self.rct = self.img.get_rect()
@@ -165,10 +165,7 @@ def main():
             if bird.rct.colliderect(bomb.rct):
                 # ゲームオーバー時に，こうかとん画像を切り替え，1秒間表示させる
                 bird.change_img(8, screen)
-                fonto = pg.font.Font(None, 80) 
-                txt = fonto.render("Game Over", True, (255, 0, 0)) #gameover
-                screen.blit(txt, [WIDTH//2-150, HEIGHT//2])
-                pg.display.update()#こうかとん泣いちゃうエフェクト #
+                pg.display.update()
                 time.sleep(1)
                 return
 
@@ -177,8 +174,6 @@ def main():
                 if beam.rct.colliderect(bomb.rct):  # ビームと爆弾の衝突判定
                     beam = None
                     bomb = None
-                    bird.change_img(6, screen)
-                    pg.display.update()#こうかとんうれしいエフェクト
 
         key_lst = pg.key.get_pressed()
         bird.update(key_lst, screen)
