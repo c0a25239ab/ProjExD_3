@@ -171,6 +171,7 @@ def main():
                 return
 
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
+                
                 """""
                 スペースキーを押すたびにビームを追加
                 """""
