@@ -8,6 +8,7 @@ import pygame as pg
 
 WIDTH = 1100  # ゲームウィンドウの幅
 HEIGHT = 650  # ゲームウィンドウの高さ
+NUM_OF_BOMBS = 5  # 爆弾の個数
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -56,6 +57,7 @@ class Bird:
         self.img = __class__.imgs[(+5, 0)]
         self.rct: pg.Rect = self.img.get_rect()
         self.rct.center = xy
+        self.effect_timer = 0  # よろこびエフェクトの表示時間
 
     def change_img(self, num: int, screen: pg.Surface):
         """
@@ -82,14 +84,21 @@ class Bird:
             self.rct.move_ip(-sum_mv[0], -sum_mv[1])
         if not (sum_mv[0] == 0 and sum_mv[1] == 0):
             self.img = __class__.imgs[tuple(sum_mv)]
-        screen.blit(self.img, self.rct)
+
+        if self.effect_timer > 0:
+            self.effect_timer -= 1
+            screen.blit(self.effect_img, self.rct)
+            if self.effect_timer == 0:
+                self.img = __class__.imgs[(+5, 0)]
+        else:
+            screen.blit(self.img, self.rct)
 
 
 class Beam:
     """
     こうかとんが放つビームに関するクラス
     """
-    def __init__(self, bird: "Bird"):
+    def __init__(self, bird:"Bird"):
         """
         ビーム画像Surfaceを生成する
         引数 bird：ビームを放つこうかとん（Birdインスタンス）
@@ -120,11 +129,11 @@ class Bomb:
         引数1 color：爆弾円の色タプル
         引数2 rad：爆弾円の半径
         """
-        self.img = pg.Surface((2 * rad, 2 * rad))
+        self.img = pg.Surface((2*rad, 2*rad))
         pg.draw.circle(self.img, color, (rad, rad), rad)
         self.img.set_colorkey((0, 0, 0))
         self.rct = self.img.get_rect()
-        self.rct.center = random.randint(0, WIDTH), random.randint(0, HEIGHT)
+        self.rct.center = random.randint(rad, WIDTH - rad), random.randint(rad, HEIGHT - rad)
         self.vx, self.vy = +5, +5
 
     def update(self, screen: pg.Surface):
@@ -146,7 +155,11 @@ def main():
     screen = pg.display.set_mode((WIDTH, HEIGHT))
     bg_img = pg.image.load("fig/pg_bg.jpg")
     bird = Bird((300, 200))
-    bomb = Bomb((255, 0, 0), 10)
+    # bomb = Bomb((255, 0, 0), 10)
+    # bombs = []
+    # for _ in range(NUM_OF_BOMBS):
+    #     bombs.append(Bomb((255, 0, 0), 10))
+    bombs = [Bomb((255, 0, 0), 10) for _ in range(NUM_OF_BOMBS)]
     beam = None  # ゲーム初期化時にはビームは存在しない
     clock = pg.time.Clock()
     tmr = 0
@@ -161,21 +174,24 @@ def main():
 
         screen.blit(bg_img, [0, 0])
 
-        if bomb is not None:
+        for bomb in bombs:
             if bird.rct.colliderect(bomb.rct):
                 # ゲームオーバー時に，こうかとん画像を切り替え，1秒間表示させる
                 bird.change_img(8, screen)
-                pg.display.update()#こうかとん泣いちゃうエフェクト
+                pg.display.update()
                 time.sleep(1)
                 return
 
-        if bomb is not None:
-            if beam is not None:
+        if beam is not None:
+            for i, bomb in enumerate(bombs):
                 if beam.rct.colliderect(bomb.rct):  # ビームと爆弾の衝突判定
                     beam = None
-                    bomb = None
-                    bird.change_img(6, screen)
-                    pg.display.update()#こうかとんうれしいエフェクト
+                    bombs[i] = None
+                    bird.effect_img = pg.transform.rotozoom(pg.image.load("fig/6.png"), 0, 0.9)
+                    bird.effect_timer = 15  # よろこびエフェクトの表示時間
+                    break
+
+        bombs = [bomb for bomb in bombs if bomb is not None]  # Noneを取り除く
 
         key_lst = pg.key.get_pressed()
         bird.update(key_lst, screen)
@@ -183,7 +199,7 @@ def main():
         if beam is not None:
             beam.update(screen)
 
-        if bomb is not None:
+        for bomb in bombs:
             bomb.update(screen)
 
         pg.display.update()
