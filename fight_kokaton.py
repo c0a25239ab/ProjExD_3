@@ -165,7 +165,7 @@ def main():
             if bird.rct.colliderect(bomb.rct):
                 # ゲームオーバー時に，こうかとん画像を切り替え，1秒間表示させる
                 bird.change_img(8, screen)
-                pg.display.update()
+                pg.display.update()#こうかとん泣いちゃうエフェクト
                 time.sleep(1)
                 return
 
@@ -174,6 +174,8 @@ def main():
                 if beam.rct.colliderect(bomb.rct):  # ビームと爆弾の衝突判定
                     beam = None
                     bomb = None
+                    bird.change_img(6, screen)
+                    pg.display.update()#こうかとんうれしいエフェクト
 
         key_lst = pg.key.get_pressed()
         bird.update(key_lst, screen)
