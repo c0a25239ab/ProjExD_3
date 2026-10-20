@@ -173,7 +173,7 @@ def main():
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
                 
                 """""
-                スペースキーを押すたびにビームを追加
+                スペースキーを押すたびにビームを追加する
                 """""
                 beams.append(Beam(bird))
 
